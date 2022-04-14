@@ -1,10 +1,5 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
-
-<h1>TSD2490 - Oblig1</h1>
-
-
 <style>
 	.container {
 		width: 400px;
@@ -19,7 +14,7 @@
 
 <div class = 'container'>
 	<div class = "row">
-		@foreach (var animal in @animalEmoji)
+		@foreach (var animal in @shuffledAnimals)
 		{
 			<div class = "col-3">
 				<button type = "button" class = "btn btn-outline-dark">
@@ -28,8 +23,8 @@
 			</div>
 		}
 	</div>
-</div>
 
+</div>
 
 @code {
 	List<string> animalEmoji = new List<string>()
@@ -43,4 +38,25 @@
 		"🐧","🐧",
 		"🐢","🐢",
 	};
+	
+	// Create a list that contains the shuffled animals
+	List<string> shuffledAnimals = new List<string>();
+
+	protected override void OnInitialized() 
+	{
+
+		SetUpGame();
+	}
+
+
+	private void SetUpGame()
+	{
+		//shuffle the animals and put them into the shuffledAnimals list
+		Random random = new Random();
+		shuffledAnimals = animalEmoji
+		.OrderBy(item => random.Next())
+		.ToList();
+
+	}
+
 }
