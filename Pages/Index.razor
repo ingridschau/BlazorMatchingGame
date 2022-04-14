@@ -5,3 +5,42 @@
 <h1>TSD2490 - Oblig1</h1>
 
 
+<style>
+	.container {
+		width: 400px;
+	}
+	
+	button {
+		width: 100px;
+		height: 100px;
+		font-size: 50px;
+	}
+</style>
+
+<div class = 'container'>
+	<div class = "row">
+		@foreach (var animal in @animalEmoji)
+		{
+			<div class = "col-3">
+				<button type = "button" class = "btn btn-outline-dark">
+					<h1>@animal</h1>
+				</button>
+			</div>
+		}
+	</div>
+</div>
+
+
+@code {
+	List<string> animalEmoji = new List<string>()
+	{
+		"🐩","🐩",
+		"🦢","🦢",
+		"🐖","🐖",
+		"🐳","🐳",
+		"🦚","🦚",
+		"🦖","🦖",
+		"🐧","🐧",
+		"🐢","🐢",
+	};
+}
