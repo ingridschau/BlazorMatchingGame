@@ -16,14 +16,14 @@
 
 <div class = 'container'>
 	<div class = "row">
-		@for (var animalNumber = 0; animalNumber < shuffledAnimals.Count; animalNumber++)
+		@for (var iconNumber = 0; iconNumber < shuffledList.Count; iconNumber++)
 		{
-			var animal = shuffledAnimals[animalNumber];
-			var uniqueDescription = $"Button #{animalNumber}";
+			var icon = shuffledList[iconNumber];
+			var uniqueDescription = $"Button #{iconNumber}";
 			<div class = "col-3">
-				<button @onclick="@(() => ButtonClick(animal, uniqueDescription))"
+				<button @onclick="@(() => ButtonClick(icon, uniqueDescription))"
 						type = "button" class = "btn btn-outline-dark">
-					<h1>@animal</h1>
+					<h1>@icon</h1>
 				</button>
 			</div>
 		}
@@ -50,11 +50,68 @@
 		"🐢","🐢",
 	};
 
-	List<string> shuffledAnimals = new List<string>();
+	List<string> foodEmoji = new List<string>()
+	{
+		"🍕","🍕",
+		"🥙","🥙",
+		"🍤","🍤",
+		"🍳","🍳",
+		"🥨","🥨",
+		"🧀","🧀",
+		"🧂","🧂",
+		"🍫","🍫",
+	};
+
+	List<string> emoji = new List<string>()
+	{
+		"🤗","🤗",
+		"😁","😁",
+		"😎","😎",
+		"😪","😪",
+		"🙄","🙄",
+		"😇","😇",
+		"🤠","🤠",
+		"🤐","🤐",
+	};
+
+
+	List<string> shuffledList = new List<string>();
+	List<string> chosenList = new List<string>();
 	int matchesFound = 0;
 	Timer timer;
 	int tenthsOfSecondsElapsed = 0;
 	string timeElapsed;
+
+	private void PickAList()
+	{
+		Random random = new Random();
+		int randomNumber;
+		randomNumber = random.Next(0, 3);
+		if (randomNumber == 0)
+		{
+			chosenList = animalEmoji;
+		}
+		else if (randomNumber == 1)
+		{
+			chosenList = foodEmoji;
+		}
+		else if (randomNumber == 2)
+		{
+			chosenList = emoji;
+		}
+
+	}
+
+	private void ShuffleList()
+	{
+		// Call the method to pick a random list
+		PickAList();
+		//Shuffle the chosen list for each time the game runs
+		Random random = new Random();
+		shuffledList = chosenList
+		.OrderBy(item => random.Next())
+		.ToList();		
+	}
 
 	// What to run when the WebApp is initialized
 	protected override void OnInitialized()
@@ -65,45 +122,35 @@
 		SetUpGame();
 	}
 
-	private void timer_Elapsed(object sender, ElapsedEventArgs e)
-	{
-		throw new NotImplementedException();
-	}
-
 	// Set up the game
 	private void SetUpGame()
 	{
-		// Shuffle the animal emojis for each time
-		Random random = new Random();
-		shuffledAnimals = animalEmoji
-		.OrderBy(item => random.Next())
-		.ToList();
-
+		ShuffleList();
 		matchesFound = 0;
 		tenthsOfSecondsElapsed = 0;
 
 	}
 
-	string lastAnimalFound = string.Empty;
+	string lastIconFound = string.Empty;
 	string lastDescription = string.Empty;
 
-	private void ButtonClick(string animal, string animalDescription)
+	private void ButtonClick(string icon, string iconDescription)
 	{
-		if (lastAnimalFound == string.Empty)
+		if (lastIconFound == string.Empty)
 		{
-			lastAnimalFound = animal;
-			lastDescription = animalDescription;
+			lastIconFound = icon;
+			lastDescription = iconDescription;
 			
 			timer.Start();
 		}
-		else if ((lastAnimalFound == animal) && (animalDescription != lastDescription))
+		else if ((lastIconFound == icon) && (iconDescription != lastDescription))
 		{
 			// Match found! Reset for next pair
-			lastAnimalFound = string.Empty;
+			lastIconFound = string.Empty;
 
 			// Replace found animals with empty string to hide them
-			shuffledAnimals = shuffledAnimals
-			.Select(a => a.Replace(animal, string.Empty))
+			shuffledList = shuffledList
+			.Select(a => a.Replace(icon, string.Empty))
 			.ToList();
 
 			matchesFound++;
@@ -117,8 +164,13 @@
 		{
 			// User selected a pair that does not match
 			// Reset selection
-			lastAnimalFound = string.Empty;
+			lastIconFound = string.Empty;
 		}
+	}
+	
+	private void timer_Elapsed(object sender, ElapsedEventArgs e)
+	{
+		throw new NotImplementedException();
 	}
 
 	private void Timer_Tick(Object source, ElapsedEventArgs e)
