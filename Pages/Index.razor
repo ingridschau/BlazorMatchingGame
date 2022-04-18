@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using System;
+@using System.IO;
 @using System.Timers
 
 <style>
@@ -12,28 +13,42 @@
 		height: 100px;
 		font-size: 50px;
 	}
+
+}
+	
+	
 </style>
 
 <div class = 'container'>
+	
 	<div class = "row">
-		@for (var iconNumber = 0; iconNumber < shuffledList.Count; iconNumber++)
-		{
-			var icon = shuffledList[iconNumber];
-			var uniqueDescription = $"Button #{iconNumber}";
-			<div class = "col-3">
-				<button @onclick="@(() => ButtonClick(icon, uniqueDescription))"
-						type = "button" class = "btn btn-outline-dark">
-					<h1>@icon</h1>
-				</button>
-			</div>
-		}
+			<button @onclick="@(() => ButtonClick(isDisabled, startButtonText))"
+							type = "button" class = "btn btn-outline-dark">
+						<h1>@startButtonText</h1>
+			</button>			
+	</div>
+	<div class = "row">
+			
+			@for (var iconNumber = 0; iconNumber < shuffledList.Count; iconNumber++)
+			{
+				var icon = shuffledList[iconNumber];
+				var uniqueDescription = $"Button #{iconNumber}";
+				<div class = "col-3">
+					<button @onclick="@(() => IconClick(icon, uniqueDescription))"
+							type = "btn" class = "btn btn-outline-dark" disabled = "@isDisabled">
+						<h1>@icon</h1>
+					</button>
+				</div>
+			}
+
+
 	</div>
 	<div class = "row">
 		<h2>Matches found: @matchesFound</h2>
 		
 	</div>
 	<div class = "row">
-		<h2>Time: @timeElapsed</h2>
+		<h2>Time left: @timeLeft</h2>
 	</div>
 </div>
 
@@ -81,6 +96,12 @@
 	Timer timer;
 	int tenthsOfSecondsElapsed = 0;
 	string timeElapsed;
+	Timer countdown;
+	int countdownTenthsOfSeconds = 20;
+	string timeLeft = "20:0s";
+	string startButtonText = "Start game";
+	bool isDisabled { get; set; } = true;
+
 
 	private void PickAList()
 	{
@@ -119,7 +140,10 @@
 		timer = new Timer(100);
 		timer.Elapsed += Timer_Tick;
 
+		countdown = new Timer(100);
+		countdown.Elapsed += Countdown_Tick;
 		SetUpGame();
+
 	}
 
 	// Set up the game
@@ -128,20 +152,21 @@
 		ShuffleList();
 		matchesFound = 0;
 		tenthsOfSecondsElapsed = 0;
+		countdownTenthsOfSeconds = 200;
 
 	}
 
 	string lastIconFound = string.Empty;
 	string lastDescription = string.Empty;
 
-	private void ButtonClick(string icon, string iconDescription)
+	private void IconClick(string icon, string iconDescription)
 	{
 		if (lastIconFound == string.Empty)
 		{
 			lastIconFound = icon;
 			lastDescription = iconDescription;
-			
-			timer.Start();
+
+
 		}
 		else if ((lastIconFound == icon) && (iconDescription != lastDescription))
 		{
@@ -154,10 +179,15 @@
 			.ToList();
 
 			matchesFound++;
+
 			if (matchesFound == 8)
 			{
 				timer.Stop();
+				countdown.Stop();
+				isDisabled = true;
+				startButtonText = "Restart game";
 				SetUpGame();
+
 			}
 		}
 		else
@@ -167,6 +197,15 @@
 			lastIconFound = string.Empty;
 		}
 	}
+
+	private void ButtonClick(Boolean startButton, string startGame)
+	{
+		
+		isDisabled = false;
+		timer.Start();
+		countdown.Start();
+	}
+
 	
 	private void timer_Elapsed(object sender, ElapsedEventArgs e)
 	{
@@ -179,6 +218,17 @@
 		{
 			tenthsOfSecondsElapsed++;
 			timeElapsed = (tenthsOfSecondsElapsed / 10F)
+				.ToString("0.0s");
+			StateHasChanged();
+		});
+	}
+	
+	private void Countdown_Tick(Object source, ElapsedEventArgs e)
+	{
+		InvokeAsync(() =>
+		{
+			countdownTenthsOfSeconds--;
+			timeLeft = (countdownTenthsOfSeconds / 10F)
 				.ToString("0.0s");
 			StateHasChanged();
 		});
