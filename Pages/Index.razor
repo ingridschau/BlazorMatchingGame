@@ -1,6 +1,5 @@
 ﻿@page "/"
 @using System;
-@using System.IO;
 @using System.Timers
 
 <style>
@@ -13,22 +12,35 @@
 		height: 100px;
 		font-size: 50px;
 	}
+	
+	#startButton {
+		width: 400px;
+		height: 80px;
+		font-size: 50px;
+	}
 
-}
+
 	
 	
 </style>
 
-<div class = 'container'>
-	
-	<div class = "row">
+
+
+	<div class = "container">
+
 			<button @onclick="@(() => ButtonClick(isDisabled, startButtonText))"
-							type = "button" class = "btn btn-outline-dark">
+							type = "button" class = "btn btn-outline-dark" id = "startButton">
 						<h1>@startButtonText</h1>
 			</button>			
 	</div>
+
+<div class = 'container'>
+	
+	
 	<div class = "row">
-			
+		
+		@if (!gameOver && !gameWon)
+		{
 			@for (var iconNumber = 0; iconNumber < shuffledList.Count; iconNumber++)
 			{
 				var icon = shuffledList[iconNumber];
@@ -40,9 +52,57 @@
 					</button>
 				</div>
 			}
+		}@if (gameOver && !gameWon)
+		{
+			@for (var stringNumber = 0; stringNumber < gameOverText.Count; stringNumber++)
+			{
+					@if (stringNumber > 3 && stringNumber < 12)
+					{
+						var icon = gameOverText[stringNumber];
+						var uniqueDescription = $"Button #{stringNumber}";
+						<div class = "col-3">
+							<button type="button" class="btn btn-inverse btn-outline-danger"><h1>@icon</h1></button>
+						</div>
+					}
+					else
+					{
+						var icon = gameOverText[stringNumber];
+						var uniqueDescription = $"Button #{stringNumber}";
+						<div class = "col-3">
+							<button type = "button" class = "btn btn-outline-dark">
+								<h1>@icon</h1>
+							</button>
+						</div>
+					}
+			}
+		}@if (!gameOver && gameWon)
+		{	
+			@for (var stringNumber = 0; stringNumber < gameCompleteText.Count; stringNumber++)
+			{
+					@if (stringNumber > 3 && stringNumber < gameCompleteText.Count)
+					{
+						var icon = gameCompleteText[stringNumber];
+						var uniqueDescription = $"Button #{stringNumber}";
+						<div class = "col-3">
+							<button type="button" class="btn btn-inverse btn-outline-success"><h1>@icon</h1></button>
+						</div>
+					}
+					else
+					{
+						var icon = gameCompleteText[stringNumber];
+						var uniqueDescription = $"Button #{stringNumber}";
+						<div class = "col-3">
+							<button type = "button" class = "btn btn-outline-dark">
+								<h1>@icon</h1>
+							</button>
+						</div>
+					}
+			}
+		}
 
 
 	</div>
+
 	<div class = "row">
 		<h2>Matches found: @matchesFound</h2>
 		
@@ -73,7 +133,7 @@
 		"🍳","🍳",
 		"🥨","🥨",
 		"🧀","🧀",
-		"🧂","🧂",
+		"🍰","🍰",
 		"🍫","🍫",
 	};
 
@@ -89,6 +149,21 @@
 		"🤐","🤐",
 	};
 
+	List<string> gameOverText = new List<string>()
+	{
+		" ", " ", " ", " ",
+		"G", "A", "M", "E",
+		"O", "V", "E", "R",
+		" ", " ", " ", " "
+	};	
+
+	List<string> gameCompleteText = new List<string>()
+	{
+		"N", "I", "C", "E!",
+		"G", "A", "M", "E",
+		"C", "O	", "M", "P",
+		"L", "E", "T", "E"
+	};	
 
 	List<string> shuffledList = new List<string>();
 	List<string> chosenList = new List<string>();
@@ -97,10 +172,16 @@
 	int tenthsOfSecondsElapsed = 0;
 	string timeElapsed;
 	Timer countdown;
-	int countdownTenthsOfSeconds = 20;
-	string timeLeft = "20:0s";
+	int countdownTenthsOfSeconds = 10;
+	string timeLeft = "10:0s";
 	string startButtonText = "Start game";
 	bool isDisabled { get; set; } = true;
+	bool gameOver { get; set; } = false;
+	bool gameWon { get; set; } = false;
+	int timesPlayed = 0;
+
+
+
 
 
 	private void PickAList()
@@ -152,7 +233,9 @@
 		ShuffleList();
 		matchesFound = 0;
 		tenthsOfSecondsElapsed = 0;
-		countdownTenthsOfSeconds = 200;
+		countdownTenthsOfSeconds = 100;
+		gameOver = false;
+		gameWon = false;
 
 	}
 
@@ -182,12 +265,7 @@
 
 			if (matchesFound == 8)
 			{
-				timer.Stop();
-				countdown.Stop();
-				isDisabled = true;
-				startButtonText = "Restart game";
-				SetUpGame();
-
+				GameComplete();
 			}
 		}
 		else
@@ -200,13 +278,16 @@
 
 	private void ButtonClick(Boolean startButton, string startGame)
 	{
-		
 		isDisabled = false;
 		timer.Start();
 		countdown.Start();
+		if (timesPlayed > 0)
+		{
+			SetUpGame();
+		}
 	}
 
-	
+
 	private void timer_Elapsed(object sender, ElapsedEventArgs e)
 	{
 		throw new NotImplementedException();
@@ -222,7 +303,7 @@
 			StateHasChanged();
 		});
 	}
-	
+
 	private void Countdown_Tick(Object source, ElapsedEventArgs e)
 	{
 		InvokeAsync(() =>
@@ -232,5 +313,31 @@
 				.ToString("0.0s");
 			StateHasChanged();
 		});
+		if (countdownTenthsOfSeconds == 0.0)
+			GameOver();
+
+
+	}
+
+	private void GameOver()
+	{
+		countdown.Stop();
+		gameOver = true;
+		isDisabled = true;
+		startButtonText = "Restart game";
+		timesPlayed++;
+
+	}
+
+	private void GameComplete()
+	{
+		timer.Stop();
+		countdown.Stop();
+		gameWon = true;
+		isDisabled = true;
+		startButtonText = "Restart game";
+		timesPlayed++;
+
+	
 	}
 }
