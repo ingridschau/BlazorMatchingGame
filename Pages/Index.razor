@@ -24,14 +24,12 @@
 	
 </style>
 
-
-
 	<div class = "container">
 
-			<button @onclick="@(() => ButtonClick(isDisabled, startButtonText))"
-							type = "button" class = "btn btn-outline-dark" id = "startButton">
-						<h1>@startButtonText</h1>
-			</button>			
+		<button @onclick="@(() => ButtonClick(isDisabled, startButtonText))"
+					type = "button" class = "btn btn-outline-dark" id = "startButton">
+				<h1>@startButtonText</h1>
+		</button>			
 	</div>
 
 <div class = 'container'>
@@ -79,24 +77,24 @@
 		{	
 			@for (var stringNumber = 0; stringNumber < gameCompleteText.Count; stringNumber++)
 			{
-					@if (stringNumber > 3 && stringNumber < gameCompleteText.Count)
-					{
-						var icon = gameCompleteText[stringNumber];
-						var uniqueDescription = $"Button #{stringNumber}";
-						<div class = "col-3">
-							<button type="button" class="btn btn-inverse btn-outline-success"><h1>@icon</h1></button>
-						</div>
-					}
-					else
-					{
-						var icon = gameCompleteText[stringNumber];
-						var uniqueDescription = $"Button #{stringNumber}";
-						<div class = "col-3">
-							<button type = "button" class = "btn btn-outline-dark">
-								<h1>@icon</h1>
-							</button>
-						</div>
-					}
+				@if (stringNumber > 3 && stringNumber < gameCompleteText.Count)
+				{
+					var icon = gameCompleteText[stringNumber];
+					var uniqueDescription = $"Button #{stringNumber}";
+					<div class = "col-3">
+						<button type="button" class="btn btn-inverse btn-outline-success"><h1>@icon</h1></button>
+					</div>
+				}
+				else
+				{
+					var icon = gameCompleteText[stringNumber];
+					var uniqueDescription = $"Button #{stringNumber}";
+					<div class = "col-3">
+						<button type = "button" class = "btn btn-outline-dark">
+							<h1>@icon</h1>
+						</button>
+					</div>
+				}
 			}
 		}
 
@@ -321,6 +319,7 @@
 
 	private void GameOver()
 	{
+		timer.Stop();
 		countdown.Stop();
 		gameOver = true;
 		isDisabled = true;
@@ -337,7 +336,5 @@
 		isDisabled = true;
 		startButtonText = "Restart game";
 		timesPlayed++;
-
-	
 	}
 }
