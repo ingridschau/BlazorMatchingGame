@@ -77,7 +77,7 @@
 		{	
 			@for (var stringNumber = 0; stringNumber < gameCompleteText.Count; stringNumber++)
 			{
-				@if (stringNumber > 3 && stringNumber < gameCompleteText.Count)
+				@if (stringNumber > 3 && stringNumber < 12)
 				{
 					var icon = gameCompleteText[stringNumber];
 					var uniqueDescription = $"Button #{stringNumber}";
@@ -170,8 +170,8 @@
 	int tenthsOfSecondsElapsed = 0;
 	string timeElapsed;
 	Timer countdown;
-	int countdownTenthsOfSeconds = 10;
-	string timeLeft = "10:0s";
+	int countdownTenthsOfSeconds = 15;
+	string timeLeft = "15:0s";
 	string startButtonText = "Start game";
 	bool isDisabled { get; set; } = true;
 	bool gameOver { get; set; } = false;
@@ -216,10 +216,10 @@
 	// What to run when the WebApp is initialized
 	protected override void OnInitialized()
 	{
-		timer = new Timer(100);
+		timer = new Timer(150);
 		timer.Elapsed += Timer_Tick;
 
-		countdown = new Timer(100);
+		countdown = new Timer(150);
 		countdown.Elapsed += Countdown_Tick;
 		SetUpGame();
 
@@ -231,7 +231,7 @@
 		ShuffleList();
 		matchesFound = 0;
 		tenthsOfSecondsElapsed = 0;
-		countdownTenthsOfSeconds = 100;
+		countdownTenthsOfSeconds = 150;
 		gameOver = false;
 		gameWon = false;
 
